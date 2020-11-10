@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.microservico.model.RepositorySummary;
+import com.microservico.service.RepositorySummaryService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,68 +26,25 @@ import io.swagger.annotations.ApiResponses;
 public class ApiController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+	private static RepositorySummaryService repositorySummary = new RepositorySummaryService();
 
-	@RequestMapping(
-		    method = RequestMethod.GET,
-		    value = "/repositorio",
-		    produces = "application/json; charset=UTF-8")
+	@RequestMapping(method = RequestMethod.GET, value = "/repositorio", produces = "application/json; charset=UTF-8")
 	@ApiOperation(value = "git-hub-controller", notes = "Lista todos os repositórios do GitHub de um determinado do usuário torvalds")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized"), 
-			@ApiResponse(code = 403, message = "Forbidden"),
-			@ApiResponse(code = 404, message = "Not Found"), })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 201, message = "Created"),
+		   @ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 403, message = "Forbidden"),
+		   @ApiResponse(code = 404, message = "Not Found"), })
 	public @ResponseBody List<RepositorySummary> listaRepositorySummarys() {
-		List<RepositorySummary> repositorySummarys;
-		repositorySummarys = new ArrayList<RepositorySummary>();
-
-		RestTemplate restTemplate = new RestTemplate();
-		List<LinkedHashMap<String, String>> repos = restTemplate
-				.getForObject("https://api.github.com/users/torvalds/repos", List.class);
-
-		for (LinkedHashMap<String, String> repo : repos) {
-			RepositorySummary repositorySummary = new RepositorySummary();
-			repositorySummary.setCreated_at(repo.get("created_at"));
-			repositorySummary.setDescription(repo.get("description"));
-			repositorySummary.setFull_name(repo.get("full_name"));
-			repositorySummary.setName(repo.get("name"));
-			repositorySummary.setLanguage(repo.get("language"));
-			repositorySummary.setOwner(repo.get("login"));
-			repositorySummary.setUpdated_at(repo.get("updated_at"));
-			repositorySummarys.add(repositorySummary);
-		}
-		return repositorySummarys;
+		
+		return repositorySummary.listaRepositorySummarys();
 	}
 
 	@RequestMapping("/repositorio/{id}")
 	@ApiOperation(value = "git-hub-controller", notes = "Lista todos os repositórios do GitHub de um determinado usuário")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized"), 
-			@ApiResponse(code = 403, message = "Forbidden"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 201, message = "Created"),
+			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 403, message = "Forbidden"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	public @ResponseBody List<RepositorySummary> listaRepositorySummarysId(@PathVariable String id) {
-		List<RepositorySummary> repositorySummarys;
-		repositorySummarys = new ArrayList<RepositorySummary>();
-
-		RestTemplate restTemplate = new RestTemplate();
-		List<LinkedHashMap<String, String>> repos = restTemplate
-				.getForObject("https://api.github.com/users/" + id + "/repos", List.class);
-
-		for (LinkedHashMap<String, String> repo : repos) {
-			RepositorySummary repositorySummary = new RepositorySummary();
-			repositorySummary.setCreated_at(repo.get("created_at"));
-			repositorySummary.setDescription(repo.get("description"));
-			repositorySummary.setFull_name(repo.get("full_name"));
-			repositorySummary.setName(repo.get("name"));
-			repositorySummary.setLanguage(repo.get("language"));
-			repositorySummary.setOwner(repo.get("login"));
-			repositorySummary.setUpdated_at(repo.get("updated_at"));
-			repositorySummarys.add(repositorySummary);
-		}
-		return repositorySummarys;
+		return repositorySummary.listaRepositorySummarysId(id);
 
 	}
 }
